@@ -12,6 +12,7 @@ Tables:
   image_assets       - metadata for synced product photos
   schema_version     - single-row migration tracker
 """
+
 from __future__ import annotations
 
 import sqlite3

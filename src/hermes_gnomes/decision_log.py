@@ -3,6 +3,7 @@
 Every auto-post or approval decision writes one JSON line to memory/decisions.log.
 Humans can grep it; Hermes can iterate it for weekly reports.
 """
+
 from __future__ import annotations
 
 import json

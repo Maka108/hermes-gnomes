@@ -9,6 +9,7 @@ Phase 0 defines:
 The live smoke test against a real folder is a manual post-plan step documented
 in the README.
 """
+
 from __future__ import annotations
 
 import hashlib

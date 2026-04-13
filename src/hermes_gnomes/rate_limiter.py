@@ -4,6 +4,7 @@ Enforces two windows per tool: per_minute and per_day. The hard cap is the
 rightmost defense -- even if the LLM decides to call a tool 1000 times in a
 loop, the tool layer fails closed.
 """
+
 from __future__ import annotations
 
 import sqlite3
@@ -50,13 +51,9 @@ class RateLimiter:
             minute_count = self._window_count(conn, tool_name, 60, now)
             day_count = self._window_count(conn, tool_name, 86400, now)
             if minute_count >= limit.per_minute:
-                raise RateLimitExceeded(
-                    f"{tool_name} per_minute cap {limit.per_minute} reached"
-                )
+                raise RateLimitExceeded(f"{tool_name} per_minute cap {limit.per_minute} reached")
             if day_count >= limit.per_day:
-                raise RateLimitExceeded(
-                    f"{tool_name} per_day cap {limit.per_day} reached"
-                )
+                raise RateLimitExceeded(f"{tool_name} per_day cap {limit.per_day} reached")
             self._window_increment(conn, tool_name, 60, now)
             self._window_increment(conn, tool_name, 86400, now)
             conn.commit()

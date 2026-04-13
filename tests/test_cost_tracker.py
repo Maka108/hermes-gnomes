@@ -29,14 +29,23 @@ def test_daily_total_sums_all_events(tmp_db_path: Path) -> None:
     init_db(tmp_db_path)
     tracker = CostTracker(db_path=tmp_db_path)
     with freeze_time("2026-04-13 08:00:00"):
-        tracker.record(CostEvent(tool_name="t", model="m", input_tokens=1,
-                                  output_tokens=1, cost_usd=0.01, action="a"))
+        tracker.record(
+            CostEvent(
+                tool_name="t", model="m", input_tokens=1, output_tokens=1, cost_usd=0.01, action="a"
+            )
+        )
     with freeze_time("2026-04-13 20:00:00"):
-        tracker.record(CostEvent(tool_name="t", model="m", input_tokens=1,
-                                  output_tokens=1, cost_usd=0.02, action="a"))
+        tracker.record(
+            CostEvent(
+                tool_name="t", model="m", input_tokens=1, output_tokens=1, cost_usd=0.02, action="a"
+            )
+        )
     with freeze_time("2026-04-14 08:00:00"):
-        tracker.record(CostEvent(tool_name="t", model="m", input_tokens=1,
-                                  output_tokens=1, cost_usd=0.99, action="a"))
+        tracker.record(
+            CostEvent(
+                tool_name="t", model="m", input_tokens=1, output_tokens=1, cost_usd=0.99, action="a"
+            )
+        )
 
     assert tracker.daily_total_usd("2026-04-13") == 0.03
     assert tracker.daily_total_usd("2026-04-14") == 0.99
@@ -51,9 +60,12 @@ def test_rolling_baseline_average(tmp_db_path: Path) -> None:
         with freeze_time(base + timedelta(days=i)):
             tracker.record(
                 CostEvent(
-                    tool_name="llm", model="m",
-                    input_tokens=1, output_tokens=1,
-                    cost_usd=cost, action="a",
+                    tool_name="llm",
+                    model="m",
+                    input_tokens=1,
+                    output_tokens=1,
+                    cost_usd=cost,
+                    action="a",
                 )
             )
     with freeze_time("2026-04-13 12:00:00"):

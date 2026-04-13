@@ -10,7 +10,9 @@ from hermes_gnomes.untrusted import (
 
 def test_wrap_adds_open_and_close_tags() -> None:
     result = wrap_untrusted("hello world", source="etsy_customer_message", customer_id="abc123")
-    assert result.startswith('<UNTRUSTED_INPUT source="etsy_customer_message" customer_id="abc123">')
+    assert result.startswith(
+        '<UNTRUSTED_INPUT source="etsy_customer_message" customer_id="abc123">'
+    )
     assert result.endswith("</UNTRUSTED_INPUT>")
     assert "hello world" in result
 

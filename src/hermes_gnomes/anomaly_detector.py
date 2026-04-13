@@ -4,6 +4,7 @@ Compares today's LLM+tool cost against the N-day rolling average.
 If today exceeds (multiplier * baseline), emits an AnomalyReport(anomalous=True).
 Callers pause automated posting and alert the user.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass

@@ -29,8 +29,18 @@ def test_sync_new_files_downloads_and_records(tmp_path: Path) -> None:
     content2 = b"fake jpeg bytes two"
     fake = FakeDriveClient(
         files=[
-            {"id": "g1", "name": "gnome_red.jpg", "mimeType": "image/jpeg", "size": str(len(content1))},
-            {"id": "g2", "name": "gnome_blue.jpg", "mimeType": "image/jpeg", "size": str(len(content2))},
+            {
+                "id": "g1",
+                "name": "gnome_red.jpg",
+                "mimeType": "image/jpeg",
+                "size": str(len(content1)),
+            },
+            {
+                "id": "g2",
+                "name": "gnome_blue.jpg",
+                "mimeType": "image/jpeg",
+                "size": str(len(content2)),
+            },
         ],
         content_map={"g1": content1, "g2": content2},
     )
@@ -64,8 +74,9 @@ def test_sync_is_idempotent_on_same_file(tmp_path: Path) -> None:
 
     content = b"same bytes every time"
     fake = FakeDriveClient(
-        files=[{"id": "g1", "name": "stable.jpg", "mimeType": "image/jpeg",
-                "size": str(len(content))}],
+        files=[
+            {"id": "g1", "name": "stable.jpg", "mimeType": "image/jpeg", "size": str(len(content))}
+        ],
         content_map={"g1": content},
     )
     reader = GDriveReader(

@@ -4,6 +4,7 @@ Phase 0: stub. Defines the sender protocol and the inbound-message formatter
 that wraps third-party content in <UNTRUSTED_INPUT> tags. Phase 1 swaps the
 FakeSender for a python-telegram-bot integration.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass

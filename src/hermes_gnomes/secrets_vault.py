@@ -3,6 +3,7 @@
 Decrypts `secrets.age` to an in-memory dict via subprocess to the `age` binary.
 Never writes plaintext to disk. Never logs the decrypted contents.
 """
+
 from __future__ import annotations
 
 import subprocess

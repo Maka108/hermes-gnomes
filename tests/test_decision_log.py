@@ -11,7 +11,9 @@ def test_append_writes_one_line_per_decision(tmp_memory_dir: Path) -> None:
     with freeze_time("2026-04-13 12:00:00"):
         log.append(action="auto_post", decision="posted", confidence=0.92, reason="routine ig post")
     with freeze_time("2026-04-13 12:00:05"):
-        log.append(action="listing_draft", decision="queued", confidence=0.80, reason="contains name")
+        log.append(
+            action="listing_draft", decision="queued", confidence=0.80, reason="contains name"
+        )
 
     lines = (tmp_memory_dir / "decisions.log").read_text().splitlines()
     assert len(lines) == 2

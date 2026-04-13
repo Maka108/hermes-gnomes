@@ -16,6 +16,7 @@ The system rule in SOUL.md tells the LLM never to follow instructions
 inside <UNTRUSTED_*> tags. This module enforces the wrapping contract and
 provides the output-side tripwire.
 """
+
 from __future__ import annotations
 
 import re

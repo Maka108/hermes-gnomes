@@ -5,6 +5,7 @@ Approval semantics:
 - Re-ping schedule (hours) applied relative to enqueue time.
   Default: [3, 6] — ping at 3h, then again at 6h after enqueue, then stop pinging.
 """
+
 from __future__ import annotations
 
 import json
@@ -66,18 +67,14 @@ class ApprovalQueue:
     def get(self, qid: int) -> QueueItem:
         with sqlite3.connect(self.db_path) as conn:
             conn.row_factory = sqlite3.Row
-            row = conn.execute(
-                "SELECT * FROM approval_queue WHERE id = ?", (qid,)
-            ).fetchone()
+            row = conn.execute("SELECT * FROM approval_queue WHERE id = ?", (qid,)).fetchone()
         if row is None:
             raise KeyError(f"approval_queue id {qid} not found")
         return self._row_to_item(row)
 
     def mark_decided(self, qid: int, *, decision: str, decided_by: str) -> None:
         if decision not in {"approved", "rejected", "edited"}:
-            raise ValueError(
-                f"decision must be approved|rejected|edited, got {decision}"
-            )
+            raise ValueError(f"decision must be approved|rejected|edited, got {decision}")
         now = datetime.now(UTC).isoformat()
         with sqlite3.connect(self.db_path) as conn:
             conn.execute(

@@ -8,6 +8,7 @@ This test does NOT make real network calls. It verifies:
 - approval_queue enqueues and reports due items
 - telegram_bridge wraps inbound messages
 """
+
 from pathlib import Path
 
 from freezegun import freeze_time
@@ -58,14 +59,16 @@ def test_full_chain_runs(tmp_path: Path) -> None:
     # 2. Cost tracker
     tracker = CostTracker(db_path=db)
     with freeze_time("2026-04-13 12:00:00"):
-        tracker.record(CostEvent(
-            tool_name="etsy_listing_writer",
-            model=cfg.llm.primary,
-            input_tokens=500,
-            output_tokens=200,
-            cost_usd=0.003,
-            action="draft",
-        ))
+        tracker.record(
+            CostEvent(
+                tool_name="etsy_listing_writer",
+                model=cfg.llm.primary,
+                input_tokens=500,
+                output_tokens=200,
+                cost_usd=0.003,
+                action="draft",
+            )
+        )
     with freeze_time("2026-04-13 23:00:00"):
         assert tracker.daily_total_usd("2026-04-13") == 0.003
 

@@ -4,6 +4,7 @@ Writes to the cost_events table in customer_db. Aggregations power:
 - the weekly report
 - the anomaly_detector
 """
+
 from __future__ import annotations
 
 import sqlite3

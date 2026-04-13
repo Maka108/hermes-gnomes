@@ -109,8 +109,12 @@ def test_mark_unsubscribed_flag_and_log(tmp_db_path: Path) -> None:
     db.mark_unsubscribed(email_hash="hash_bob", source="one_click", at=_now())
 
     with db.connect() as conn:
-        customer = conn.execute("SELECT unsubscribed FROM customers WHERE id = ?", (cid,)).fetchone()
-        logs = conn.execute("SELECT * FROM unsubscribes WHERE email_hash = ?", ("hash_bob",)).fetchall()
+        customer = conn.execute(
+            "SELECT unsubscribed FROM customers WHERE id = ?", (cid,)
+        ).fetchone()
+        logs = conn.execute(
+            "SELECT * FROM unsubscribes WHERE email_hash = ?", ("hash_bob",)
+        ).fetchall()
     assert customer["unsubscribed"] == 1
     assert len(logs) == 1
     assert logs[0]["source"] == "one_click"
@@ -148,9 +152,7 @@ def test_record_order_links_to_customer(tmp_db_path: Path) -> None:
 def test_record_order_is_idempotent_per_platform_id(tmp_db_path: Path) -> None:
     init_db(tmp_db_path)
     db = CustomerDB(tmp_db_path)
-    cid = db.upsert_customer(
-        email_hash="h", email_cipher=b"c", display_name="D", first_seen=_now()
-    )
+    cid = db.upsert_customer(email_hash="h", email_cipher=b"c", display_name="D", first_seen=_now())
     first = db.record_order(
         customer_id=cid,
         platform="etsy",
