@@ -57,7 +57,23 @@ class Config(BaseModel):
         return self.rate_limits["default"]
 
 
+class ConfigError(RuntimeError):
+    """Raised when a config file cannot be read, parsed, or validated."""
+
+
 def load_config(path: Path) -> Config:
-    """Load and validate a YAML config file."""
-    data = yaml.safe_load(path.read_text())
+    """Load and validate a YAML config file.
+
+    Wraps file I/O and YAML parsing errors in ConfigError with the path for
+    context. Pydantic validation errors propagate unchanged (their messages
+    are already structured and actionable).
+    """
+    try:
+        raw = path.read_text()
+    except OSError as e:
+        raise ConfigError(f"could not read config at {path}: {e}") from e
+    try:
+        data = yaml.safe_load(raw)
+    except yaml.YAMLError as e:
+        raise ConfigError(f"invalid YAML in {path}: {e}") from e
     return Config.model_validate(data)

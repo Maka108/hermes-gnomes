@@ -4,7 +4,7 @@ import pytest
 import yaml
 from pydantic import ValidationError
 
-from hermes_gnomes.config import Config, load_config
+from hermes_gnomes.config import Config, ConfigError, load_config
 
 
 def _sample_config() -> dict:
@@ -81,5 +81,29 @@ def test_invalid_approval_mode_raises(tmp_config_dir: Path) -> None:
     path = tmp_config_dir / "config.yaml"
     path.write_text(yaml.safe_dump(bad))
 
-    with pytest.raises(ValidationError):
+    with pytest.raises(ValidationError, match="approval_mode"):
+        load_config(path)
+
+
+def test_rate_limit_for_raises_when_default_missing(tmp_config_dir: Path) -> None:
+    data = _sample_config()
+    del data["rate_limits"]["default"]
+    path = tmp_config_dir / "config.yaml"
+    path.write_text(yaml.safe_dump(data))
+    cfg = load_config(path)
+
+    with pytest.raises(KeyError, match="default"):
+        cfg.rate_limit_for("some_unknown_tool")
+
+
+def test_load_config_raises_config_error_on_missing_file(tmp_path: Path) -> None:
+    missing = tmp_path / "nope.yaml"
+    with pytest.raises(ConfigError, match="could not read"):
+        load_config(missing)
+
+
+def test_load_config_raises_config_error_on_malformed_yaml(tmp_config_dir: Path) -> None:
+    path = tmp_config_dir / "bad.yaml"
+    path.write_text("not: valid: yaml: [unbalanced")
+    with pytest.raises(ConfigError, match="invalid YAML"):
         load_config(path)
