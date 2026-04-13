@@ -1,0 +1,29 @@
+[Unit]
+Description=Hermes Gnomes autopilot agent
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=gnomes
+Group=gnomes
+WorkingDirectory=/home/gnomes/.hermes
+Environment="TZ=America/Los_Angeles"
+Environment="PYTHONUNBUFFERED=1"
+ExecStartPre=/usr/bin/age -d -i /home/gnomes/.config/hermes-gnomes/age.key -o /tmp/hermes-gnomes.env /home/gnomes/.config/hermes-gnomes/secrets.age
+ExecStart=/home/gnomes/.hermes/.venv/bin/python -m hermes_gnomes.main
+ExecStopPost=/bin/rm -f /tmp/hermes-gnomes.env
+Restart=on-failure
+RestartSec=10
+StartLimitInterval=300
+StartLimitBurst=5
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/gnomes/.hermes/data /home/gnomes/.hermes/memory /home/gnomes/.hermes/sessions
+
+[Install]
+WantedBy=multi-user.target

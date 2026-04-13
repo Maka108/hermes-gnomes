@@ -1,0 +1,22 @@
+# US holidays on which routine posting is skipped.
+# Campaign posts tied to these dates are explicitly authored and bypass this skip.
+skip_routine_posting:
+  - name: "New Year's Day"
+    date: "2026-01-01"
+  - name: "Memorial Day"
+    date: "2026-05-25"
+  - name: "Independence Day"
+    date: "2026-07-04"
+  - name: "Labor Day"
+    date: "2026-09-07"
+  - name: "Thanksgiving"
+    date: "2026-11-26"
+  - name: "Christmas Eve"
+    date: "2026-12-24"
+  - name: "Christmas Day"
+    date: "2026-12-25"
+  - name: "New Year's Eve"
+    date: "2026-12-31"
+
+# No follow-up messages on these weekdays (0=Mon, 6=Sun)
+no_followup_weekdays: [6]

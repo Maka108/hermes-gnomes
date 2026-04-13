@@ -1,0 +1,55 @@
+# Hermes Gnomes runtime configuration
+business_name: gnome-statues
+timezone: America/Los_Angeles
+
+# Quiet hours - no outbound customer contact during these hours (local time)
+quiet_hours:
+  start: "22:00"   # 10pm PT
+  end: "07:00"     # 7am PT
+
+# Default scheduled content times
+default_post_time: "09:00"   # 9am PT = noon ET
+weekly_report_time: "08:00"
+weekly_report_day: "Sunday"
+
+# Approval mode: cautious | balanced | permissive
+approval_mode: balanced
+
+# Rate limits per platform tool (shared default)
+rate_limits:
+  default:
+    per_minute: 5
+    per_day: 50
+  etsy_api_client:
+    per_minute: 5
+    per_day: 50
+  instagram_poster:
+    per_minute: 3
+    per_day: 30
+  pinterest_poster:
+    per_minute: 5
+    per_day: 50
+  tiktok_poster:
+    per_minute: 2
+    per_day: 10
+
+# Approval queue re-ping schedule (hours after enqueue)
+approval_repings_hours: [3, 6]
+
+# Cost anomaly detector
+anomaly_baseline_days: 7
+anomaly_multiplier: 3.0
+
+# OpenRouter model fallback chain
+llm:
+  primary: "anthropic/claude-haiku-4.5"
+  fallbacks:
+    - "openai/gpt-4o-mini"
+    - "anthropic/claude-sonnet-4.5"
+
+# Paths (relative to repo root on VPS, absolute in dev)
+paths:
+  data_dir: data
+  memory_dir: memory
+  skills_dir: skills
+  sessions_dir: sessions
