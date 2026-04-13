@@ -177,3 +177,104 @@ class CustomerDB:
             conn.commit()
         finally:
             conn.close()
+
+    def upsert_customer(
+        self,
+        *,
+        email_hash: str,
+        email_cipher: bytes,
+        display_name: str | None,
+        first_seen: str,
+    ) -> int:
+        """Insert a customer, or update display_name/email_cipher if they already exist.
+
+        Returns the customer row id.
+        """
+        with self.connect() as conn:
+            existing = conn.execute(
+                "SELECT id FROM customers WHERE email_hash = ?", (email_hash,)
+            ).fetchone()
+            if existing:
+                conn.execute(
+                    """
+                    UPDATE customers
+                    SET email_cipher = ?, display_name = ?
+                    WHERE id = ?
+                    """,
+                    (email_cipher, display_name, existing["id"]),
+                )
+                return int(existing["id"])
+            cur = conn.execute(
+                """
+                INSERT INTO customers (email_hash, email_cipher, display_name, first_seen)
+                VALUES (?, ?, ?, ?)
+                """,
+                (email_hash, email_cipher, display_name, first_seen),
+            )
+            return int(cur.lastrowid)
+
+    def mark_unsubscribed(self, *, email_hash: str, source: str, at: str) -> None:
+        """Flag customer as unsubscribed and append an audit row."""
+        with self.connect() as conn:
+            conn.execute(
+                "UPDATE customers SET unsubscribed = 1 WHERE email_hash = ?",
+                (email_hash,),
+            )
+            conn.execute(
+                """
+                INSERT INTO unsubscribes (email_hash, source, created_at)
+                VALUES (?, ?, ?)
+                """,
+                (email_hash, source, at),
+            )
+
+    def record_order(
+        self,
+        *,
+        customer_id: int,
+        platform: str,
+        platform_order_id: str,
+        sku: str | None,
+        amount_cents: int,
+        currency: str,
+        created_at: str,
+        status: str,
+    ) -> int:
+        """Insert an order. If the (platform, platform_order_id) pair already exists,
+        return the existing id without modification."""
+        with self.connect() as conn:
+            existing = conn.execute(
+                "SELECT id FROM orders WHERE platform = ? AND platform_order_id = ?",
+                (platform, platform_order_id),
+            ).fetchone()
+            if existing:
+                return int(existing["id"])
+            cur = conn.execute(
+                """
+                INSERT INTO orders (
+                    customer_id, platform, platform_order_id, sku,
+                    amount_cents, currency, created_at, status
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    customer_id,
+                    platform,
+                    platform_order_id,
+                    sku,
+                    amount_cents,
+                    currency,
+                    created_at,
+                    status,
+                ),
+            )
+            return int(cur.lastrowid)
+
+    def active_customers(self) -> list[sqlite3.Row]:
+        """Return all customers who are not unsubscribed."""
+        with self.connect() as conn:
+            return list(
+                conn.execute(
+                    "SELECT * FROM customers WHERE unsubscribed = 0 ORDER BY id"
+                ).fetchall()
+            )
