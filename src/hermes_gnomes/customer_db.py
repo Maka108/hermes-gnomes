@@ -147,11 +147,14 @@ CREATE INDEX IF NOT EXISTS idx_image_assets_sha ON image_assets(sha256);
 def init_db(path: Path) -> None:
     """Create the DB file and all tables if they don't exist.
 
-    Idempotent: safe to call on every service start.
+    Idempotent: safe to call on every service start. Enables WAL journal
+    mode so Phase 1's concurrent tool-call workers can read while a
+    writer holds the write lock.
     """
     path.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(path)
     try:
+        conn.execute("PRAGMA journal_mode=WAL")
         conn.executescript(_SCHEMA)
         cur = conn.execute("SELECT version FROM schema_version")
         row = cur.fetchone()

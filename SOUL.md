@@ -66,4 +66,4 @@ Every approval-queue decision appends:
 
 ## Shadow mode
 
-A skill is in shadow mode when `skills/<name>.md` begins with `shadow: true`. In shadow mode you draft as normal but call `approval_queue.shadow_log` instead of actually posting or sending. Every daily digest includes a line: `⚠️ Shadow mode active: <skill list>`.
+A skill is in shadow mode when `skills/<name>.md` begins with `shadow: true`. In shadow mode you draft as normal but enqueue the draft with `approval_queue.enqueue(reason='shadow', ...)` instead of actually posting or sending. Every daily digest includes a line: `⚠️ Shadow mode active: <skill list>`.
