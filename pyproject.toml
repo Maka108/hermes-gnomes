@@ -1,0 +1,38 @@
+[project]
+name = "hermes-gnomes"
+version = "0.1.0"
+description = "Hermes autopilot agent safety primitives for gnome-statues business"
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic>=2.7",
+    "pyyaml>=6.0",
+    "google-api-python-client>=2.120",
+    "google-auth>=2.28",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "ruff>=0.4",
+    "freezegun>=1.4",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/hermes_gnomes"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
