@@ -224,3 +224,36 @@ async def test_402_payment_required_raises_immediately() -> None:
         await client.aclose()
 
     assert call_count["n"] == 1, "402 should not trigger fallback retries"
+
+
+@pytest.mark.asyncio
+async def test_canonical_model_name_from_openrouter_still_prices() -> None:
+    """OpenRouter returns canonical names with date suffixes
+    (e.g. 'anthropic/claude-4.5-haiku-20251001') even when we request the
+    alias 'anthropic/claude-haiku-4.5'. The pricing lookup must still find
+    Haiku pricing via substring fallback.
+    """
+
+    def handler(_request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            json=_build_completion_response(
+                model="anthropic/claude-4.5-haiku-20251001",
+                input_tokens=100,
+                output_tokens=50,
+            ),
+        )
+
+    client = _make_client(handler)
+    try:
+        response = await client.complete(system="s", user="u")
+    finally:
+        await client.aclose()
+
+    assert response.model == "anthropic/claude-4.5-haiku-20251001"
+    expected_cost = (
+        100 / 1_000_000 * HAIKU_45_INPUT_USD_PER_MTOK
+        + 50 / 1_000_000 * HAIKU_45_OUTPUT_USD_PER_MTOK
+    )
+    assert response.cost_usd == pytest.approx(expected_cost)
+    assert response.cost_usd > 0

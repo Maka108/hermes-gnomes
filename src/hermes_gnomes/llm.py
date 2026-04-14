@@ -161,13 +161,34 @@ def _extract_error(resp: httpx.Response) -> str:
         return resp.text[:200]
 
 
+def _pricing_for(model: str) -> tuple[float, float] | None:
+    """Look up (input, output) per-million-token pricing for a model.
+
+    Tries exact match first, then falls back to substring matching because
+    OpenRouter sometimes returns canonical names with date suffixes
+    (e.g. ``anthropic/claude-4.5-haiku-20251001``) instead of the alias we
+    requested (``anthropic/claude-haiku-4.5``).
+    """
+    if model in _MODEL_PRICING:
+        return _MODEL_PRICING[model]
+
+    model_lower = model.lower()
+    if "haiku" in model_lower and "4.5" in model_lower:
+        return _MODEL_PRICING["anthropic/claude-haiku-4.5"]
+    if "gpt-4o-mini" in model_lower:
+        return _MODEL_PRICING["openai/gpt-4o-mini"]
+    if "sonnet" in model_lower and "4.5" in model_lower:
+        return _MODEL_PRICING["anthropic/claude-sonnet-4.5"]
+    return None
+
+
 def _parse_completion(payload: dict) -> LLMResponse:
     model = payload["model"]
     text = payload["choices"][0]["message"]["content"]
     usage = payload["usage"]
     input_tokens = int(usage["prompt_tokens"])
     output_tokens = int(usage["completion_tokens"])
-    pricing = _MODEL_PRICING.get(model)
+    pricing = _pricing_for(model)
     if pricing is None:
         cost_usd = 0.0
     else:
