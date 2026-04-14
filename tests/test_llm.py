@@ -70,9 +70,7 @@ async def test_complete_returns_text_and_usage() -> None:
         captured["body"] = json.loads(request.content.decode("utf-8"))
         return httpx.Response(
             200,
-            json=_build_completion_response(
-                text="Hi there.", input_tokens=20, output_tokens=4
-            ),
+            json=_build_completion_response(text="Hi there.", input_tokens=20, output_tokens=4),
         )
 
     client = _make_client(handler)
@@ -87,8 +85,7 @@ async def test_complete_returns_text_and_usage() -> None:
     assert response.input_tokens == 20
     assert response.output_tokens == 4
     expected_cost = (
-        20 / 1_000_000 * HAIKU_45_INPUT_USD_PER_MTOK
-        + 4 / 1_000_000 * HAIKU_45_OUTPUT_USD_PER_MTOK
+        20 / 1_000_000 * HAIKU_45_INPUT_USD_PER_MTOK + 4 / 1_000_000 * HAIKU_45_OUTPUT_USD_PER_MTOK
     )
     assert response.cost_usd == pytest.approx(expected_cost)
 
