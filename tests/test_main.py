@@ -19,7 +19,6 @@ from hermes_gnomes.customer_db import init_db
 from hermes_gnomes.llm import LLMError, LLMResponse
 from hermes_gnomes.main import handle_message
 
-
 # --- Fake objects that mimic python-telegram-bot's Update / Message --- #
 
 
